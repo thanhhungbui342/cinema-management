@@ -1,6 +1,7 @@
 package com.thanhhungbui342.cinema.entity;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,9 +25,9 @@ import lombok.Setter;
 public class Product extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "product_id")
-    private Long id;
+    private UUID id;
 
     @Column(name = "barcode", unique = true, length = 50)
     private String barcode;

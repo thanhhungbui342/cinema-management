@@ -2,6 +2,7 @@ package com.thanhhungbui342.cinema.entity;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,9 +29,9 @@ import lombok.Setter;
 public class Showtime extends BaseEntity{
 
     @Id 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "showtime_id")
-    private Long id;
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "movie_id", nullable = false)

@@ -2,6 +2,7 @@ package com.thanhhungbui342.cinema.entity;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,9 +28,9 @@ import lombok.Setter;
 public class Role{
 
     @Id 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "role_id")
-    private Long id;
+    private UUID id;
 
     @Column(name = "name", nullable = false, unique = true, length = 50)
     private String name;

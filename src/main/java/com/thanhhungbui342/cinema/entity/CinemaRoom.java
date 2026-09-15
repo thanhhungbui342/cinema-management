@@ -2,6 +2,7 @@ package com.thanhhungbui342.cinema.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -30,9 +31,9 @@ import lombok.Setter;
 public class CinemaRoom {
 
     @Id 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "cinema_room_id")
-    private Long id;
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cinema_id", nullable = false) 
@@ -47,7 +48,7 @@ public class CinemaRoom {
     @Column(name = "status", length = 50)
     private String status;
 
-    @OneToMany(mappedBy = "cinemaRooms", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "cinemaRoom", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
     private List<Seat> seats = new ArrayList<>();
 }

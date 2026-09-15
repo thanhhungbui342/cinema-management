@@ -1,5 +1,7 @@
 package com.thanhhungbui342.cinema.entity;
 
+import java.util.UUID;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -25,9 +27,9 @@ import lombok.Setter;
 public class Seat {
 
     @Id 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "seat_id")
-    private Long id;
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cinema_id", nullable = false)

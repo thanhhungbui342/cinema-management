@@ -2,6 +2,7 @@ package com.thanhhungbui342.cinema.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -28,9 +29,9 @@ import lombok.Setter;
 public class Cinema {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "cinema_id") 
-    private Long id;
+    private UUID id;
 
     @Column(name = "name", nullable = false, length = 100)
     private String name;

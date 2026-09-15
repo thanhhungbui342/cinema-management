@@ -1,6 +1,7 @@
 package com.thanhhungbui342.cinema.entity;
 
 import java.time.Instant;
+import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,9 +28,9 @@ import lombok.Setter;
 public class TicketsLedger {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "tickets_ledger_id")
-    private Long id;
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "showtime_id", nullable = false)

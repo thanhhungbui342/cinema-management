@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -32,9 +33,9 @@ import lombok.Setter;
 public class Booking {
 
     @Id 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "booking_id")
-    private Long id;
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cinema_id", nullable = false)
