@@ -18,26 +18,24 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity 
-@Table(name = "roles")
+@Table(name = "genres")
 @Getter 
 @Setter 
 @NoArgsConstructor 
 @AllArgsConstructor 
 @Builder 
-public class Role{
+
+public class Genre {
 
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "role_id")
+    @Column(name = "genre_id")
     private Long id;
 
-    @Column(name = "name", nullable = false, unique = true, length = 50)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @Column(name = "description", length = 50)
-    private String description;
-    
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "genres", fetch = FetchType.LAZY)
     @Builder.Default
-    private Set<User> users = new HashSet<>();
+    private Set<Movie> movies = new HashSet<>();
 }

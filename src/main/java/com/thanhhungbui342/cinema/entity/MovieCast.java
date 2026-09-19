@@ -1,8 +1,5 @@
 package com.thanhhungbui342.cinema.entity;
 
-import java.time.Instant;
-import java.util.UUID;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,32 +16,25 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity 
-@Table(name = "seat_holds")
+@Table(name = "movie_cast")
 @Getter 
 @Setter 
 @NoArgsConstructor 
 @AllArgsConstructor 
 @Builder 
-public class SeatHold {
 
+public class MovieCast {
+    
     @Id 
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "seat_hold_id")
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "person_id", nullable = false)
+    private Person persons;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "showtime_id", nullable = false)
-    private Showtime showtime;
+    @JoinColumn(name = "movie_id", nullable = false)
+    private Movie movie;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "seat_id", nullable = false)
-    private Seat seat;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @Column(name = "hold_expire_at", nullable = false)
-    private Instant holdExpireAt;
-
+    @Column(name = "cast_type", nullable = false)
+    private String CastType;
 }

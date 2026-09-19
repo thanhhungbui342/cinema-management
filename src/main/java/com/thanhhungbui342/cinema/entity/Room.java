@@ -2,11 +2,12 @@ package com.thanhhungbui342.cinema.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,18 +23,18 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity 
-@Table(name = "cinema_rooms")
+@Table(name = "rooms")
 @Getter 
 @Setter 
 @NoArgsConstructor 
 @AllArgsConstructor 
 @Builder 
-public class CinemaRoom {
+public class Room {
 
     @Id 
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "cinema_room_id")
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "room_id")
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cinema_id", nullable = false) 
@@ -42,13 +43,22 @@ public class CinemaRoom {
     @Column(name = "room_name", nullable = false, length = 50)
     private String name;
 
-    @Column(name = "room_type", length = 50)
-    private String type;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "room_type_id", nullable = false)
+    private RoomType roomType;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 50)
-    private String status;
+    @Builder.Default
+    private RoomStatus status = RoomStatus.ACTIVE;
 
     @OneToMany(mappedBy = "cinemaRoom", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
     private List<Seat> seats = new ArrayList<>();
+
+    public enum RoomStatus{
+        ACTIVE,
+        MAINTENANCE,
+        INACTIVE
+    }
 }

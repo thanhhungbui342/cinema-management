@@ -1,7 +1,6 @@
 package com.thanhhungbui342.cinema.entity;
 
-import java.math.BigDecimal;
-import java.util.UUID;
+import java.time.Instant;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,31 +17,34 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * BookingTicket
- */
-
 @Entity 
-@Table(name = "booking_tickets")
+@Table(name = "movie_review")
 @Getter 
 @Setter 
 @NoArgsConstructor 
 @AllArgsConstructor 
 @Builder 
-public class BookingTicket {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "booking_ticket_id")
-    private UUID id;
+public class MovieReview {
+
+    @Id 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "review_id")
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "booking_id", nullable = false)
-    private Booking booking;
+    @JoinColumn(name = "movie_id", nullable = false)
+    private Movie movie;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "showtime_seat_id", nullable = false)
-    private ShowtimeSeat showtimeSeat;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    @Column(name = "price", nullable = false, precision = 12, scale = 2)
-    private BigDecimal price;
+    @Column(name = "rating", nullable = false)
+    private Integer rating;
+
+    @Column(name = "comment", length = 500)
+    private String comment;
+
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt; 
 }

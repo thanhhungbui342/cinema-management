@@ -1,8 +1,11 @@
 package com.thanhhungbui342.cinema.entity;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+
+import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,22 +33,35 @@ import lombok.Setter;
 public class User {
 
     @Id 
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private UUID id;
+    private Long id;
 
-    @Column(name = "name", nullable = false, length = 100)
-    private String name;
+    @UuidGenerator 
+    @Column(name = "uuid", nullable = false, updatable = false)
+    private UUID uuid;
 
     @Column(name = "email", nullable = false, length = 150)
     private String email;
 
-    @Column(name = "phoneNumber", length = 20)
-    private String phoneNumber;
+    @Column(name = "full_name", nullable = false, length = 100)
+    private String name;
+
+    @Column(name = "password", nullable = false)
+    private String password;
+
+    @Column(name = "phone", length = 20)
+    private String phone;
+
+    @Column(name = "created_at")
+    private Instant createdAt;
+
+    @Column(name = "updated_at")
+    private Instant updatedAt;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-        name = "user_role", 
+        name = "user_roles", 
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )

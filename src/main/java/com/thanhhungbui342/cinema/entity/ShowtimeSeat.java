@@ -1,7 +1,6 @@
 package com.thanhhungbui342.cinema.entity;
 
-import java.math.BigDecimal;
-import java.util.UUID;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,9 +28,9 @@ import lombok.Setter;
 public class ShowtimeSeat {
 
     @Id 
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "showtime_seat_id")
-    private UUID id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "showtime_id", nullable = false)
@@ -41,8 +40,15 @@ public class ShowtimeSeat {
     @JoinColumn(name = "seat_id", nullable = false)
     private Seat seat;
 
-    @Column(name = "price", nullable = false, precision = 12, scale = 12)
-    private BigDecimal price;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @Column(name = "status", nullable = false)
+    private String status;
+
+    @Column(name = "locked_until")
+    private LocalDateTime lockedUntil;
 
     @Version 
     @Column(name = "row_version")

@@ -1,10 +1,8 @@
 package com.thanhhungbui342.cinema.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import org.hibernate.annotations.UuidGenerator;
+import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -22,33 +20,26 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity 
-@Table(name = "cinemas")
+@Table(name = "seat_types")
 @Getter 
 @Setter 
 @NoArgsConstructor 
 @AllArgsConstructor 
 @Builder 
-public class Cinema {
+public class SeatType {
 
-    @Id
+    @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "cinema_id") 
+    @Column(name = "seat_type_id")
     private Long id;
 
-    @UuidGenerator 
-    @Column(name = "uuid", nullable = false, unique = true)
-    private UUID uuid;
-
-    @Column(name = "name", nullable = false, length = 100)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @Column(name = "address", length = 100)
-    private String address;
+    @Column(name = "surcharge", nullable = false)
+    private BigDecimal surcharge;
 
-    @Column(name = "phone", length = 20)
-    private String phone;
-
-    @OneToMany(mappedBy = "cinema", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "seatType", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
-    private List<Room> Room = new ArrayList<>();
+    private Set<Seat> seats = new HashSet<>();
 }

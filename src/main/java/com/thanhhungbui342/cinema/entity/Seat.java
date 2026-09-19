@@ -1,9 +1,9 @@
 package com.thanhhungbui342.cinema.entity;
 
-import java.util.UUID;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,23 +27,32 @@ import lombok.Setter;
 public class Seat {
 
     @Id 
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "seat_id")
-    private UUID id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "cinema_id", nullable = false)
-    private CinemaRoom cinemaRoom;
+    @JoinColumn(name = "room_id", nullable = false)
+    private Room Room;
 
-    @Column(name = "row_seat", nullable = false, length = 20)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "seat_type_id", nullable = false)
+    private SeatType seatType;
+
+    @Column(name = "seat_row", nullable = false, length = 20)
     private String row;
 
     @Column(name = "seat_number", nullable = false, length = 20) 
-    private String number;
+    private String number;  
 
-    @Column(name = "seat_type", length = 20)
-    private String type;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    @Builder.Default
+    private SeatStatus status = SeatStatus.ACTIVE;
 
-    @Column(name = "status")
-    private String status;
+    public enum SeatStatus{
+        ACTIVE,
+        HELD,
+        BROKEN
+    }
 }
