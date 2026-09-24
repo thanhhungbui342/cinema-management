@@ -5,6 +5,11 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "payments")
@@ -20,8 +25,10 @@ public class Payment {
     @Column(name = "payment_id")
     private Long paymentId;
 
+    @UuidGenerator 
+    @JdbcTypeCode(SqlTypes.CHAR) 
     @Column(name = "uuid", nullable = false, unique = true, length = 36)
-    private String uuid;
+    private UUID uuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)

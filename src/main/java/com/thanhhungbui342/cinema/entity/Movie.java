@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,6 +43,8 @@ public class Movie {
     @Column(name = "movie_id")
     private Long id;
 
+    @UuidGenerator 
+    @JdbcTypeCode(SqlTypes.CHAR) 
     @Column(name = "uuid", nullable = false , unique = true)
     private UUID uuid;
 

@@ -52,7 +52,7 @@ public class Room {
     @Builder.Default
     private RoomStatus status = RoomStatus.ACTIVE;
 
-    @OneToMany(mappedBy = "cinemaRoom", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
     private List<Seat> seats = new ArrayList<>();
 

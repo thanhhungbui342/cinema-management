@@ -7,7 +7,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "combos")
@@ -24,6 +26,7 @@ public class Combo {
     private Long comboId;
 
     @UuidGenerator 
+    @JdbcTypeCode(SqlTypes.CHAR) 
     @Column(name = "uuid", nullable = false, unique = true, length = 36)
     private String uuid;
 

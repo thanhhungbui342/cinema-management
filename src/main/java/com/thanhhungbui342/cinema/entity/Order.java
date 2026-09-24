@@ -3,11 +3,15 @@ package com.thanhhungbui342.cinema.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "orders")
@@ -23,8 +27,10 @@ public class Order {
     @Column(name = "order_id")
     private Long orderId;
 
+    @UuidGenerator 
+    @JdbcTypeCode(SqlTypes.CHAR) 
     @Column(name = "uuid", nullable = false, unique = true, length = 36)
-    private String uuid;
+    private UUID uuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_orders_user"))

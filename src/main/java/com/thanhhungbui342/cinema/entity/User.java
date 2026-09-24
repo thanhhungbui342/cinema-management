@@ -5,10 +5,18 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,6 +32,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity 
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "users")
 @Getter 
 @Setter 
@@ -38,6 +47,7 @@ public class User {
     private Long id;
 
     @UuidGenerator 
+    @JdbcTypeCode(SqlTypes.CHAR) 
     @Column(name = "uuid", nullable = false, updatable = false)
     private UUID uuid;
 
@@ -45,7 +55,10 @@ public class User {
     private String email;
 
     @Column(name = "full_name", nullable = false, length = 100)
-    private String name;
+    private String fullname;
+
+    @Column(name = "username", nullable = false, length = 50)
+    private String username;
 
     @Column(name = "password", nullable = false)
     private String password;
@@ -53,11 +66,17 @@ public class User {
     @Column(name = "phone", length = 20)
     private String phone;
 
-    @Column(name = "created_at")
-    private Instant createdAt;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private UserStatus status = UserStatus.ACTIVE;
 
+    @CreatedDate 
+    @Column(name = "created_at")
+    private Instant createdAt = Instant.now();
+
+    @LastModifiedDate 
     @Column(name = "updated_at")
-    private Instant updatedAt;
+    private Instant updatedAt = Instant.now();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -67,4 +86,10 @@ public class User {
     )
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
+
+    public enum UserStatus {
+        ACTIVE,
+        INACTIVE,
+        BLOCKED
+    }
 }
