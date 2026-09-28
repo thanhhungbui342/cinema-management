@@ -58,7 +58,7 @@ public class Showtime{
     @Column(name = "end_time", nullable = false)
     private Instant endTime;
 
-    @Column(name = "base_price", nullable = false, precision = 12, scale = 12)
+    @Column(name = "base_price", nullable = false, precision = 12, scale = 2)
     private BigDecimal basePrice;
 
     @Column(name = "total_seats", nullable = false)

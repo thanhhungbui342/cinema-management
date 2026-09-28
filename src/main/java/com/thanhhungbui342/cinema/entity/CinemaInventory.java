@@ -17,7 +17,6 @@ public class CinemaInventory {
 
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cinema_id", nullable = false)

@@ -55,6 +55,7 @@ public class SecurityConfig {
             .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers("/api/v1/movies/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
