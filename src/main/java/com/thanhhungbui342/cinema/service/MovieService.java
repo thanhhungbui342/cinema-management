@@ -11,12 +11,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.thanhhungbui342.cinema.dto.request.MovieCreateRequest;
+import com.thanhhungbui342.cinema.dto.request.MovieUpdateRequest;
 import com.thanhhungbui342.cinema.dto.respone.MovieResponse;
 import com.thanhhungbui342.cinema.entity.Genre;
+import com.thanhhungbui342.cinema.entity.Movie;
 import com.thanhhungbui342.cinema.entity.Movie.MovieStatus;
 import com.thanhhungbui342.cinema.mapper.MovieMapper;
+import com.thanhhungbui342.cinema.repository.GenreRepository;
 import com.thanhhungbui342.cinema.repository.MovieRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service 
@@ -25,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class MovieService {
 
     private final MovieRepository movieRepository;
+    private final GenreRepository genreRepository;
     private final MovieMapper movieMapper;
 
     // READ OPERATIONS
@@ -69,5 +75,49 @@ public class MovieService {
 
         return movieRepository.findByKeyword(keyword, pageable)
                                 .map(movieMapper::toMovieResponse);
+    }
+
+    // WRITE OPERATIONS
+    @Transactional 
+    public MovieResponse createMovie(MovieCreateRequest request){
+
+        Set<Genre> genres = fetchAndValidateGenres(request.genreIds());
+
+        Movie movie = movieMapper.toMovieEntity(request);
+        movie.setGenres(genres);
+
+        Movie savedMovie = movieRepository.save(movie);
+        return movieMapper.toMovieResponse(savedMovie); 
+    }
+
+    @Transactional 
+    public MovieResponse updateMovie(MovieUpdateRequest request, UUID uuid){
+
+        Movie movie = movieRepository.findByUuid(uuid)
+                                    .orElseThrow(() -> new EntityNotFoundException("Movie not found"));
+
+        movieMapper.updateMovieFromRequest(request, movie);
+
+        if (request.genreIds() != null && !request.genreIds().isEmpty()) {
+            Set<Genre> genres = fetchAndValidateGenres(request.genreIds());
+            movie.setGenres(genres);
+        }
+
+        Movie updateMovie = movieRepository.saveAndFlush(movie);
+        return movieMapper.toMovieResponse(updateMovie);
+    }    
+
+    // HELPED METHODS
+    public Set<Genre> fetchAndValidateGenres(Set<Long> genreIds){
+        if (genreIds == null || genreIds.isEmpty()) {
+            return Set.of();
+        }
+
+        Set<Genre> genres = genreRepository.findAllByIdIn(genreIds);
+        if(genres.size() != genreIds.size()){
+            throw new IllegalArgumentException("1 or more is not match");
+        }
+
+        return genres;
     }
 }

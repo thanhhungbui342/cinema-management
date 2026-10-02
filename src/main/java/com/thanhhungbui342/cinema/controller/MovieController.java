@@ -1,7 +1,7 @@
 package com.thanhhungbui342.cinema.controller;
 
-import com.thanhhungbui342.cinema.repository.MovieRepository;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.thanhhungbui342.cinema.dto.respone.MovieResponse;
+import com.thanhhungbui342.cinema.entity.Genre;
 import com.thanhhungbui342.cinema.entity.Movie.MovieStatus;
 import com.thanhhungbui342.cinema.service.MovieService;
 
@@ -25,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/movies")
 public class MovieController {
 
-    private final MovieRepository movieRepository;
     private final MovieService movieService;
 
     @GetMapping 
@@ -36,12 +36,10 @@ public class MovieController {
         @RequestParam(defaultValue = "releaseDate") String sortBy,
         @RequestParam(defaultValue = "DESC") String direction
     ) {
-        // Tạo đối tượng Sort tùy chỉnh theo chiều ASC hoặc DESC
         Sort sort = direction.equalsIgnoreCase("ASC") 
                 ? Sort.by(sortBy).ascending() 
                 : Sort.by(sortBy).descending();
 
-        // Khởi tạo Pageable
         PageRequest pageable = PageRequest.of(page, size, sort);
 
         return ResponseEntity.ok(movieService.getMovieByStatus(status, pageable));
@@ -60,5 +58,38 @@ public class MovieController {
     @GetMapping("/{uuid}") 
     public ResponseEntity<MovieResponse> getMovieByUuid(@PathVariable UUID uuid){
         return ResponseEntity.ok(movieService.getMovieById(uuid));
+    }
+
+    @GetMapping("/genre")
+    public ResponseEntity<Page<MovieResponse>> searchMovieByGenres(
+        @RequestParam Set<Genre> genres,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "releaseDate") String sortBy,
+        @RequestParam(defaultValue = "DESC") String direction
+    ){
+        Sort sort = direction.equalsIgnoreCase("ASC") 
+            ? Sort.by(sortBy).ascending() 
+            : Sort.by(sortBy).descending();
+
+        PageRequest pageable = PageRequest.of(page, size, sort);
+
+        return ResponseEntity.ok(movieService.searchByGenres(genres, pageable));
+    }
+
+    public ResponseEntity<Page<MovieResponse>> searchMovieByKeyword(
+        @RequestParam String keyword,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "releaseDate") String sortBy,
+        @RequestParam(defaultValue = "DESC") String direction
+    ){
+        Sort sort = direction.equalsIgnoreCase("ASC") 
+            ? Sort.by(sortBy).ascending() 
+            : Sort.by(sortBy).descending();
+
+        PageRequest pageable = PageRequest.of(page, size, sort);
+
+        return ResponseEntity.ok(movieService.searchByKeyword(keyword, pageable));
     }
 }

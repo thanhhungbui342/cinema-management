@@ -13,6 +13,7 @@ public record MovieResponse(
     String description,
     Integer duaration,
     LocalDate releaseDate,
+    LocalDate endedDate,
     String ageRating,
     String posterUrl,
     MovieStatus status

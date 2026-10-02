@@ -3,6 +3,7 @@ package com.thanhhungbui342.cinema.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -39,4 +40,14 @@ public interface MovieRepository extends JpaRepository<Movie, Long>{
 
     @Query("SELECT m FROM Movie m WHERE m.releaseDate >= :today")
     List<Movie> findComingSoonMovies(@Param("today") LocalDate today);
+
+    @Modifying 
+    @Query("UPDATE Movie m SET m.status = 'NOW_SHOWING' " +
+           "WHERE m.status = 'COMING_SOON' AND m.releaseDate <= :today")
+    int updateStatusToNowShowing(LocalDate today);
+
+    @Modifying 
+    @Query("UPDATE Movie m SET m.status = 'ENDED' "+
+           "WHERE m.status = 'NOW_SHOWING' AND m.endedDate < :today")
+    int updateStatusToEnded(LocalDate today);
 }
