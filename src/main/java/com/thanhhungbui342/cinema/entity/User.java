@@ -68,15 +68,16 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
+    @Builder.Default
     private UserStatus status = UserStatus.ACTIVE;
 
     @CreatedDate 
     @Column(name = "created_at")
-    private Instant createdAt = Instant.now();
+    private Instant createdAt;
 
     @LastModifiedDate 
     @Column(name = "updated_at")
-    private Instant updatedAt = Instant.now();
+    private Instant updatedAt;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

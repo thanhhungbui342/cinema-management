@@ -50,7 +50,7 @@ public class Showtime{
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "room_id", nullable = false)
-    private Room Room;
+    private Room room;
 
     @Column(name = "start_time", nullable = false)
     private Instant startTime;
@@ -65,10 +65,12 @@ public class Showtime{
     private Integer totalSeats;
 
     @Column(name = "booked_seats", nullable = false)
-    private Integer bookedSeats;
+    @Builder.Default
+    private Integer bookedSeats = 0;
 
     @Column(name = "held_seats", nullable = false)
-    private Integer heldSeats;
+    @Builder.Default
+    private Integer heldSeats = 0;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20)

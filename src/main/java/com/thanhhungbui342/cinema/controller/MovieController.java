@@ -60,7 +60,7 @@ public class MovieController {
         return ResponseEntity.ok(movieService.getMovieById(uuid));
     }
 
-    @GetMapping("/genre")
+    @GetMapping("/{genre}")
     public ResponseEntity<Page<MovieResponse>> searchMovieByGenres(
         @RequestParam Set<Genre> genres,
         @RequestParam(defaultValue = "0") int page,
@@ -77,6 +77,7 @@ public class MovieController {
         return ResponseEntity.ok(movieService.searchByGenres(genres, pageable));
     }
 
+    @GetMapping("/search")
     public ResponseEntity<Page<MovieResponse>> searchMovieByKeyword(
         @RequestParam String keyword,
         @RequestParam(defaultValue = "0") int page,

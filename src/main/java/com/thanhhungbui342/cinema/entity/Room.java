@@ -52,6 +52,9 @@ public class Room {
     @Builder.Default
     private RoomStatus status = RoomStatus.ACTIVE;
 
+    @Column(name = "total_seats", nullable = false)
+    private Integer totalSeats;
+
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
     private List<Seat> seats = new ArrayList<>();

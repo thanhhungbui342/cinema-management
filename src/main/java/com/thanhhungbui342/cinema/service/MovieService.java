@@ -103,7 +103,7 @@ public class MovieService {
             movie.setGenres(genres);
         }
 
-        Movie updateMovie = movieRepository.saveAndFlush(movie);
+        Movie updateMovie = movieRepository.save(movie);
         return movieMapper.toMovieResponse(updateMovie);
     }    
 
