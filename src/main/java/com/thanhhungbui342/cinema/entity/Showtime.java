@@ -80,9 +80,12 @@ public class Showtime{
     public enum ShowtimeStatus{
         SCHEDULED,
         SELLING,
-        CLOSED,
         SHOWING,
         FINISHED,
-        CANCELED
+        CANCELED;
+
+        public boolean isEditable(){
+            return this == SCHEDULED || this == SELLING;
+        }
     }
 }

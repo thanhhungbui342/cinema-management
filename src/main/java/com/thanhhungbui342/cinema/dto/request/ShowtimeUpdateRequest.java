@@ -8,11 +8,11 @@ import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 
 public record ShowtimeUpdateRequest(
-    @NotNull(message = "Movie ID is required")
-    Long movieId,
+    @NotNull(message = "Showtime ID is required")
+    Long showtimeId,
 
     @NotNull(message = "Room ID is required")
-    Long roomId, 
+    Long roomId,
 
     @NotNull(message = "Start time is required")
     @Future(message = "Start time must be in future")

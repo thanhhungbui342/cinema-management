@@ -57,7 +57,7 @@ public class Movie {
     private String description;
 
     @Column(name = "duration_minutes", nullable = false)
-    private Integer duaration;
+    private Integer duration;
 
     @Column(name = "release_date", nullable = false)
     private LocalDate releaseDate;

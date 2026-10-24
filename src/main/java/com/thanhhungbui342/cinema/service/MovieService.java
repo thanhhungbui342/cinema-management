@@ -17,11 +17,12 @@ import com.thanhhungbui342.cinema.dto.respone.MovieResponse;
 import com.thanhhungbui342.cinema.entity.Genre;
 import com.thanhhungbui342.cinema.entity.Movie;
 import com.thanhhungbui342.cinema.entity.Movie.MovieStatus;
+import com.thanhhungbui342.cinema.exception.AppException;
+import com.thanhhungbui342.cinema.exception.ErrorCode;
 import com.thanhhungbui342.cinema.mapper.MovieMapper;
 import com.thanhhungbui342.cinema.repository.GenreRepository;
 import com.thanhhungbui342.cinema.repository.MovieRepository;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service 
@@ -56,7 +57,7 @@ public class MovieService {
     public MovieResponse getMovieById(UUID uuid){
         return movieRepository.findByUuid(uuid)
                                 .map(movieMapper::toMovieResponse)
-                                .orElseThrow(() -> new RuntimeException("Error UUID"));
+                                .orElseThrow(() -> new AppException(ErrorCode.MOVIE_NOT_FOUND));
     }
 
     public Page<MovieResponse> searchByGenres(Set<Genre> genres, Pageable pageable){
@@ -94,7 +95,7 @@ public class MovieService {
     public MovieResponse updateMovie(MovieUpdateRequest request, UUID uuid){
 
         Movie movie = movieRepository.findByUuid(uuid)
-                                    .orElseThrow(() -> new EntityNotFoundException("Movie not found"));
+                                    .orElseThrow(() -> new AppException(ErrorCode.MOVIE_NOT_FOUND));
 
         movieMapper.updateMovieFromRequest(request, movie);
 
@@ -115,7 +116,7 @@ public class MovieService {
 
         Set<Genre> genres = genreRepository.findAllByIdIn(genreIds);
         if(genres.size() != genreIds.size()){
-            throw new IllegalArgumentException("1 or more is not match");
+            throw new AppException(ErrorCode.GENRE_NOT_FOUND);
         }
 
         return genres;
