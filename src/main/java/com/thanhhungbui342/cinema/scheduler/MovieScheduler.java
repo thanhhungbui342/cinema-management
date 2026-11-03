@@ -1,4 +1,4 @@
-package com.thanhhungbui342.cinema.service;
+package com.thanhhungbui342.cinema.scheduler;
 
 import java.time.LocalDate;
 
