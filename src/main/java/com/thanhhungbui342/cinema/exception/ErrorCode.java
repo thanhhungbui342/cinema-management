@@ -14,10 +14,12 @@ public enum ErrorCode {
     MOVIE_TITLE_BLANK(1002, "Tên phim không được để trống", HttpStatus.BAD_REQUEST),
     MOVIE_DURATION_INVALID(1003, "Thời lượng phim phải là số nguyên dương", HttpStatus.BAD_REQUEST),
     GENRE_IDS_INVALID(1004, "Danh sách thể loại không hợp lệ", HttpStatus.BAD_REQUEST),
+    SHOWTIME_CANCEL_INVALID(1005, "Không thể hủy suất chiếu", HttpStatus.BAD_REQUEST),
 
     // 2xxx: Movie Module
     MOVIE_NOT_FOUND(2001, "Không tìm thấy phim yêu cầu", HttpStatus.NOT_FOUND),
     GENRE_NOT_FOUND(2002, "Một hoặc nhiều thể loại phim không tồn tại", HttpStatus.NOT_FOUND),
+    SHOWTIME_NOT_FOUND(2003, "Lịch chiếu không tồn tại", HttpStatus.NOT_FOUND),
 
     // 3xxx: Booking Module
     BOOKING_CONFLICT(3001, "Xung đột lịch đặt vé", HttpStatus.CONFLICT);

@@ -35,3 +35,6 @@ build/
 # File cấu hình môi trường chứa mật khẩu
 *.env
 application-local.properties
+
+#AI Rules
+.cursorrules

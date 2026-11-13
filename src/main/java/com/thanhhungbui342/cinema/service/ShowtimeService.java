@@ -5,27 +5,30 @@ import com.thanhhungbui342.cinema.repository.RoomRepository;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
+import java.time.ZoneId;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.thanhhungbui342.cinema.dto.request.ShowtimeCreateRequest;
+import com.thanhhungbui342.cinema.dto.request.ShowtimeFilterRequest;
 import com.thanhhungbui342.cinema.dto.request.ShowtimeUpdateRequest;
 import com.thanhhungbui342.cinema.dto.respone.ShowtimeResponse;
 import com.thanhhungbui342.cinema.entity.Movie;
 import com.thanhhungbui342.cinema.entity.Room;
 import com.thanhhungbui342.cinema.entity.Showtime;
+import com.thanhhungbui342.cinema.entity.Room.RoomStatus;
+import com.thanhhungbui342.cinema.entity.Showtime.ShowtimeStatus;
 import com.thanhhungbui342.cinema.exception.AppException;
 import com.thanhhungbui342.cinema.exception.ErrorCode;
 import com.thanhhungbui342.cinema.mapper.ShowtimeMapper;
 import com.thanhhungbui342.cinema.repository.MovieRepository;
 import com.thanhhungbui342.cinema.repository.ShowtimeRepository;
+import com.thanhhungbui342.cinema.repository.specification.ShowtimeSpecification;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -39,47 +42,27 @@ public class ShowtimeService{
     private final ShowtimeRepository showtimeRepository;
     private final ShowtimeMapper showtimeMapper;
 
+    @Value("${app.cinema.timezone:Asia/Ho_Chi_Minh}")
+    private String cinemaTimezone;
+
     private static final int CLEAN_ROOM_TIME = 15;
     
     //READ OPERATIONS
-    public Map<Long, List<ShowtimeResponse>> getAllShowtimeByDate(LocalDate date){
+    public Page<ShowtimeResponse> getShowtimesWithFilter(ShowtimeFilterRequest filterRequest, Pageable pageable){
+        Specification<Showtime> specification = ShowtimeSpecification.filterShowtimes(filterRequest);
 
-        Instant startOfDate = date.atStartOfDay(ZoneOffset.UTC).toInstant();
-        Instant endOfDate = date.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant().minusNanos(1);
+        Page<Showtime> showtimePage = showtimeRepository.findAll(specification, pageable);
 
-        List<Showtime> showtimes = showtimeRepository.findShowtimeByTime(startOfDate, endOfDate);
-        return groupShowtimesBy(showtimes, ShowtimeResponse::movieId);
-    }
-
-    public List<ShowtimeResponse> getAllShowtimeGroupByRoom(Long roomId, LocalDate date){
-
-        if(!roomRepository.existsById(roomId)){
-            throw new EntityNotFoundException("Room ID is not found:" + roomId);
-        }
-
-        Instant startOfDate = date.atStartOfDay(ZoneOffset.UTC).toInstant();
-        Instant endOfDate = date.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant().minusNanos(1);
-
-        return getAllBy(() -> showtimeRepository.findShowtimeByRoom(roomId, startOfDate, endOfDate));
-    }
-
-    public List<ShowtimeResponse> getAllShowtimeGroupByMovie(Long movieId, LocalDate date){
-
-        if(!movieRepository.existsById(movieId)){
-            throw new EntityNotFoundException("Movie ID is not found:" + movieId);
-        }
-
-        Instant startOfDate = date.atStartOfDay(ZoneOffset.UTC).toInstant();
-        Instant endOfDate = date.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant().minusNanos(1);
-
-        return getAllBy(() -> showtimeRepository.findShowtimeByMovie(movieId, startOfDate, endOfDate));
+        return showtimePage.map(showtimeMapper::toShowtimeResponse);
     }
 
     //WRITE OPERATIONS
     @Transactional 
     public ShowtimeResponse createShowtime(ShowtimeCreateRequest request){
         Movie movie = findMovieById(request.movieId());
-        Room room = findRoomById(request.roomId());
+        Room room = findRoomByIdWithLock(request.roomId());
+
+        validateRoomAndMovie(room, movie, request.startTime());
 
         Instant calculatedEndTime = calculateEndTime(request.startTime(), movie.getDuration());
 
@@ -100,9 +83,9 @@ public class ShowtimeService{
     @Transactional 
     public ShowtimeResponse updateShowtime(ShowtimeUpdateRequest request, Long showtimeId){
         Showtime showtime = showtimeRepository.findById(showtimeId)
-                                            .orElseThrow(() -> new IllegalArgumentException("Showtime is not found"));
+                                            .orElseThrow(() -> new AppException(ErrorCode.SHOWTIME_NOT_FOUND));
         
-        Room room = findRoomById(request.roomId());
+        Room room = findRoomByIdWithLock(request.roomId());
         Movie movie = showtime.getMovie();
 
         Instant calculatedEndTime = calculateEndTime(request.startTime(), movie.getDuration());
@@ -118,23 +101,38 @@ public class ShowtimeService{
         return showtimeMapper.toShowtimeResponse(updateShowtime);
     }
 
-    // HELPED METHOD
-    private <K> Map<K, List<ShowtimeResponse>> groupShowtimesBy(
-        List<Showtime> showtimes,
-        Function<ShowtimeResponse, K> classifier
-    ){
-        return showtimes.stream()
-                        .map(showtimeMapper::toShowtimeResponse)
-                        .collect(Collectors.groupingBy(classifier));
+    @Transactional
+    public void cancelShowtime(Long showtimeId){
+        Showtime showtime = showtimeRepository.findById(showtimeId)
+                                            .orElseThrow(() -> new AppException(ErrorCode.SHOWTIME_NOT_FOUND));
+        
+        if (showtime.getStatus() == ShowtimeStatus.FINISHED || showtime.getStatus() == ShowtimeStatus.CANCELED) {
+            throw new AppException(ErrorCode.SHOWTIME_CANCEL_INVALID);
+        }
+
+        showtime.setStatus(ShowtimeStatus.CANCELED);
+        showtimeRepository.save(showtime);
     }
 
-    private List<ShowtimeResponse> getAllBy(
-        Supplier<List<Showtime>> supplier
-    ){
-        return supplier.get()
-                        .stream()
-                        .map(showtimeMapper::toShowtimeResponse)
-                        .toList();
+    // HELPED METHOD
+    private void validateRoomAndMovie(Room room, Movie movie, Instant startTime){
+        if (room.getStatus() != RoomStatus.ACTIVE) {
+            throw new IllegalArgumentException("Room is not active for scheduled");
+        }
+
+        if (startTime.isBefore(Instant.now())) {
+            throw new IllegalArgumentException("Start time must be in the future");
+        }
+
+        LocalDate showDate = startTime.atZone(ZoneId.of(cinemaTimezone)).toLocalDate();
+
+        if (movie.getReleaseDate() != null && showDate.isBefore(movie.getReleaseDate())) {
+            throw new IllegalArgumentException("Show Date cannot be before Release Date");
+        }
+
+        if (movie.getEndedDate() != null && showDate.isAfter(movie.getEndedDate())) {
+            throw new IllegalArgumentException("Show date cannot be after End Date");
+        }
     }
 
     private Movie findMovieById(Long movieId){
@@ -144,6 +142,11 @@ public class ShowtimeService{
 
     private Room findRoomById(Long roomId){
         return roomRepository.findById(roomId)
+                            .orElseThrow(() -> new EntityNotFoundException("Room is not found"));
+    }
+
+    private Room findRoomByIdWithLock(Long roomId){
+        return roomRepository.findRoomByIdWithLock(roomId)
                             .orElseThrow(() -> new EntityNotFoundException("Room is not found"));
     }
 

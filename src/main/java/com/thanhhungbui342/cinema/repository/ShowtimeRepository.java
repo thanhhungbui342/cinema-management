@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,49 +12,11 @@ import org.springframework.data.repository.query.Param;
 import com.thanhhungbui342.cinema.entity.Showtime;
 import com.thanhhungbui342.cinema.entity.Showtime.ShowtimeStatus;
 
-public interface ShowtimeRepository extends JpaRepository<Showtime, Long>{
-
-    @Query(
-        """
-        SELECT s FROM Showtime s 
-        JOIN FETCH s.movie m
-        JOIN FETCH s.room r
-        WHERE s.startTime >= :start 
-          AND s.startTime <= :end 
-          AND s.status NOT IN ('CANCELED')
-        ORDER BY s.startTime ASC
-        """
-    )
-    List<Showtime> findShowtimeByTime(@Param("start") Instant start,@Param("end") Instant end);
-
-    @Query("""
-        SELECT s FROM Showtime s 
-        JOIN FETCH s.movie m
-        JOIN FETCH s.room r
-        WHERE s.room.id = :roomId
-          AND s.startTime >= :start 
-          AND s.startTime <= :end 
-          AND s.status NOT IN ('CANCELED')
-        ORDER BY s.startTime ASC
-    """)
-    List<Showtime> findShowtimeByRoom(@Param("roomId") Long roomId, @Param("start") Instant start, @Param("end") Instant end);
-
-    @Query(
-        """
-        SELECT s FROM Showtime s 
-        JOIN FETCH s.movie m
-        JOIN FETCH s.room r
-        WHERE s.movie.id = :movieId
-            AND s.startTime >= :start 
-            AND s.startTime <= :end 
-            AND s.status NOT IN ('CANCELED')
-        ORDER BY s.startTime ASC
-        """)
-    List<Showtime> findShowtimeByMovie(@Param("movieId") Long movieId, @Param("start") Instant start,@Param("end") Instant end);
+public interface ShowtimeRepository extends JpaRepository<Showtime, Long>, JpaSpecificationExecutor<Showtime>{
 
     @Query("""
         SELECT COUNT(s) > 0 FROM Showtime s
-        WHERE s.room.id = :roomId
+        WHERE s.room.id = :roomId    
         AND (:excludeShowtimeId IS NULL OR s.id != :excludeShowtimeId)
         AND s.status NOT IN ('CANCELED')
         AND s.startTime < :endTime
