@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -34,19 +35,22 @@ public class GlobalExceptionHandler {
     }                       
 
     @ExceptionHandler(AppException.class) 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleMovieNotFoundException(AppException exception){
-        return ErrorResponse.builder()
-                            .status(HttpStatus.NOT_FOUND.value())
-                            .message(exception.getMessage())
-                            .timestamp(LocalDateTime.now())
-                            .build();
+    public ResponseEntity<ErrorResponse> handleAppException(AppException exception){
+        ErrorCode errorCode = exception.getErrorCode();
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                                        .status(errorCode.getCode())
+                                        .message(errorCode.getMessage())
+                                        .timestamp(LocalDateTime.now())
+                                        .build();
+
+        return ResponseEntity.status(errorCode.getHttpStatus()).body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleGenericException(Exception exception){
-        log.error("Unhandle Exception appears");
+        log.error("Unhandle Exception appears", exception);
 
         return ErrorResponse.builder()
                             .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -54,6 +58,5 @@ public class GlobalExceptionHandler {
                             .timestamp(LocalDateTime.now())
                             .build();
     }
-
 
 }
